@@ -1,6 +1,9 @@
 package sample;
 
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.stage.FileChooser;
@@ -11,6 +14,9 @@ import net.beadsproject.beads.ugens.SamplePlayer;
 import net.beadsproject.beads.ugens.Static;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import static net.beadsproject.beads.ugens.SamplePlayer.LoopType.*;
 
 /*
 Synthesizer class for handling the Beads library.
@@ -18,12 +24,14 @@ Handles messages the MidiKeyboard class
 which manipulates the sound.
 */
 
-public class Synthesizer {
+public class Synthesizer implements Runnable{
     AudioContext ac = new AudioContext();
     GranularSamplePlayer gsp;
     MidiKeyboard midiKeyboard;
     Controller controller;
     View view;
+    private boolean newSampleSelected = false;
+
 
     // Midi arrays
     private float[] knobValues = new float[9];
@@ -44,15 +52,46 @@ public class Synthesizer {
         Sample sourceSample = null;
 
         try {
-            sourceSample = new Sample("Sinus.wav");
+            sourceSample = new Sample("C:\\Users\\kaese47\\OneDrive\\Dokumenter\\SourceTree\\GranularGrandaddy\\Sinus.wav");
         }
         catch(Exception e){
             System.out.println(e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }
+
         gsp = new GranularSamplePlayer(ac, sourceSample);
         ac.out.addInput(gsp);
+    }
+    // maxvalue property
+    private final DoubleProperty maxValue = new SimpleDoubleProperty(0.0);
+    private SamplePlayer.LoopType loopDirection;
+
+    public DoubleProperty maxValueProperty() {
+        return maxValue;
+    }
+
+    public final Double getMaxValueProperty() {
+        return maxValueProperty().get();
+    }
+
+    public final void setMaxValue(Double maxValue) {
+        maxValueProperty().set(maxValue);
+    }
+
+    //currentValue property
+    private final DoubleProperty currentValue = new SimpleDoubleProperty(0.0);
+
+    public DoubleProperty currentValueProperty() {
+        return currentValue;
+    }
+
+    public final Double getCurrentValueProperty() {
+        return currentValueProperty().get();
+    }
+
+    public final void setCurrentValue(Double currentValue) {
+        currentValueProperty().set(currentValue);
     }
 
     public void setController(Controller controller){
@@ -205,37 +244,26 @@ public class Synthesizer {
         }
     }
 
-    // Loop forwards
-    public void setLoopForwards(){
-        gsp.setLoopType(SamplePlayer.LoopType.LOOP_FORWARDS);
-        Platform.runLater(() -> {
-            view.selectLoopComb.setValue("Forwards");
-        });
+    public void setLoopForwards() {
+        loopDirection = LOOP_FORWARDS;
+        gsp.setLoopType(loopDirection);
     }
 
-    // Loop backwards
-    public void setLoopBackwards(){
-        gsp.setLoopType(SamplePlayer.LoopType.LOOP_BACKWARDS);
-        Platform.runLater(() -> {
-            view.selectLoopComb.setValue("Backwards");
-        });
+    public void setLoopBackwards() {
+        loopDirection = LOOP_BACKWARDS;
+        gsp.setLoopType(loopDirection);
     }
 
-    // Loop alternating
-    public void setLoopAlternating(){
-        gsp.setLoopType(SamplePlayer.LoopType.LOOP_ALTERNATING);
-        Platform.runLater(() -> {
-            view.selectLoopComb.setValue("Alternating");
-        });
+    public void setLoopAlternating() {
+        loopDirection = LOOP_ALTERNATING;
+        gsp.setLoopType(loopDirection);
     }
 
-    // Set reset
-    public void setReset(){
+    public void setReset() {
         gsp.reset();
-        Platform.runLater(() -> {
-            view.selectLoopComb.setValue("Reset");
-        });
     }
+
+
 
     // Update View
     public void updateGUI(Label label, Spinner text, int knob){
@@ -281,6 +309,10 @@ public class Synthesizer {
     }
 
     public GranularSamplePlayer mountGspSample(){
+        // Creates a new audiocontext if new sample chosen
+        ac.stop();
+        ac.out.kill();
+        ac = new AudioContext();
 
         Sample sourceSample = null;
         try {
@@ -292,12 +324,25 @@ public class Synthesizer {
             e.printStackTrace();
             sampleReady = false;
         }
+
+        //resize slider - value is in seconds;do it in new thread bc
+        // https://www.reddit.com/r/javahelp/comments/7qvqau/problem_with_updating_gui_javafx/
+        Sample finalSourceSample = sourceSample;
+        Platform.runLater(() -> {
+            this.setMaxValue(finalSourceSample.getLength() / 1000);
+        });
+
+        gsp = new GranularSamplePlayer(ac, sourceSample);
         this.gsp.setSample(sourceSample);
         gsp.setLoopType(SamplePlayer.LoopType.LOOP_FORWARDS);
         ac.out.clearInputConnections();
         ac.out.addInput(gsp);
         ac.start();
         return gsp;
+    }
+
+    public void updateAudioContext() {
+        newSampleSelected = true;
     }
 
     // Play / pause
@@ -307,5 +352,43 @@ public class Synthesizer {
 
     public void playSample(){
         gsp.pause(false);
+    }
+
+    @Override
+    public void run() {
+        System.out.println("OVERRIDE HAPPENED");
+
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                while (true) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (gsp != null) {
+                                System.out.println("Position value is " + gsp.getPosition()/1000);
+                                setCurrentValue(gsp.getPosition()/1000);
+                            }
+                        }
+                    });
+                    TimeUnit.MILLISECONDS.sleep(100);
+                }
+            }
+        };
+        new Thread(() -> task.run()).start();
+
+        System.out.println("After task run");
+
+        // while-loop to configure modifiers live
+        while (gsp != null) {
+
+            if (newSampleSelected) {
+                //if a new sample is selected, load it and clear the flag
+                gsp = this.mountGspSample();
+                newSampleSelected = false;
+            }
+
+
+        }
     }
 }
