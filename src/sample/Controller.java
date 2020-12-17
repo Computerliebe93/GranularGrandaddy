@@ -65,31 +65,25 @@ public class Controller {
             model.setEnd(Float.parseFloat(view.endValueLbl.getText()));
         });
 
-        // Set spray
-        view.sprayBtn.setOnAction(e -> {
-            model.updateGUI(view.sprayValueLbl, view.sprayInput, 7);
-            model.setSpray(Float.parseFloat(view.sprayValueLbl.getText()));
-        });
-
-        // Set loop type
+        // Loop type
         view.selectLoopComb.setOnAction(e -> {
-            switch (view.selectLoopComb.getValue()) {
-                case "Forwards" -> {
+            switch(view.selectLoopComb.getValue()) {
+                case "Forwards":
                     model.setLoopForwards();
                     System.out.println("Forwards");
-                }
-                case "Backwards" -> {
+                    break;
+                case "Backwards":
                     model.setLoopBackwards();
                     System.out.println("Backwards");
-                }
-                case "Alternating" -> {
+                    break;
+                case "Alternating":
                     model.setLoopAlternating();
                     System.out.println("Alternating");
-                }
-                case "Reset" -> {
+                    break;
+                case "Reset":
                     model.setReset();
                     System.out.println("Reset");
-                }
+                    break;
             }
         });
 
@@ -97,8 +91,11 @@ public class Controller {
         view.selectSampleBtn.setOnAction( e ->{
             Window primaryStage = null;
             File selectedFile = model.selectSample().showOpenDialog(primaryStage);
-            model.setSample(selectedFile);
-            view.samplePath.setText(model.getSample());
+            if(selectedFile != null) {
+                model.setSample(selectedFile);
+                view.samplePath.setText(model.getSample());
+                model.updateAudioContext();
+            }
         });
 
         // Load sample button

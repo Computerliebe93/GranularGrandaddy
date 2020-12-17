@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -22,9 +23,9 @@ public class View {
         createAndConfigure();
     }
 
-    private HBox Header;
-    private BorderPane StartView;
-    private GridPane Grid;
+    private HBox header;
+    private BorderPane startView;
+    private GridPane grid;
 
     // Sample
     Label sampleLbl = new Label("Sample: ");
@@ -79,101 +80,132 @@ public class View {
     String loopTypes [] = {"Forwards", "Backwards", "Alternating", "Reset"};
     ComboBox<String> selectLoopComb = new ComboBox<>(FXCollections.observableArrayList(loopTypes));
 
+    //Visualizer
+    Slider slider = new Slider(0, 100, 50);
+    Label sliderNameLbl = new Label("Progress bar");
+
     // Exit
     Button exitBtn = new Button("Exit");
 
     private void createAndConfigure(){
-        Header = new HBox();
-        Grid = new GridPane();
-        StartView = new BorderPane();
-        StartView.setTop(Header);
-        StartView.setCenter(Grid);
-        Grid.setHgap(5);
-        Grid.setVgap(5);
+        header = new HBox();
+        grid = new GridPane();
+        startView = new BorderPane();
+        startView.setTop(header);
+        startView.setCenter(grid);
+        grid.setHgap(5);
+        grid.setVgap(5);
 
         // Sample
-        Header.getChildren().addAll(sampleLbl, selectSampleBtn, samplePath, loadSampleBtn, pauseToggleBtn);
+        header.getChildren().addAll(sampleLbl, selectSampleBtn, samplePath, loadSampleBtn, pauseToggleBtn);
         samplePath.setMaxHeight(2);
         samplePath.setMinWidth(90);
 
         // Pitch
-        Grid.add(pitchNameLbl, 2, 5);
+        grid.add(pitchNameLbl, 2, 5);
         pitchInput.setMaxSize(60, 10);
         pitchInput.setEditable(true);
-        Grid.add(pitchInput, 2, 6);
-        Grid.add(pitchBtn, 2, 7);
+        grid.add(pitchInput, 2, 6);
+        grid.add(pitchBtn, 2, 7);
         pitchValueLbl.setMinWidth(40);
         pitchValueLbl.setMaxWidth(40);
-        Grid.add(pitchValueLbl, 3, 6);
+        grid.add(pitchValueLbl, 3, 6);
 
         // GrainSize
-        Grid.add(grainSizeNameLbl, 2, 8);
+        grid.add(grainSizeNameLbl, 2, 8);
         grainSizeInput.setMaxSize(60, 20);
         grainSizeInput.setEditable(true);
-        Grid.add(grainSizeInput, 2, 9);
-        Grid.add(grainSizeBtn, 2, 10);
-        Grid.add(grainSizeValueLbl, 3, 9);
+        grid.add(grainSizeInput, 2, 9);
+        grid.add(grainSizeBtn, 2, 10);
+        grid.add(grainSizeValueLbl, 3, 9);
         grainSizeValueLbl.setMinWidth(40);
         grainSizeValueLbl.setMaxWidth(40);
 
         // GrainSize
-        Grid.add(grainIntervalNameLbl, 2, 11);
+        grid.add(grainIntervalNameLbl, 2, 11);
         grainIntervalInput.setMaxSize(60, 20);
         grainIntervalInput.setEditable(true);
-        Grid.add(grainIntervalInput, 2, 12);
-        Grid.add(grainIntervalBtn, 2, 13);
+        grid.add(grainIntervalInput, 2, 12);
+        grid.add(grainIntervalBtn, 2, 13);
         grainIntervalValueLbl.setMinWidth(40);
         grainIntervalValueLbl.setMaxWidth(40);
-        Grid.add(grainIntervalValueLbl, 3, 12);
+        grid.add(grainIntervalValueLbl, 3, 12);
 
         // Randomness
-        Grid.add(randomnessNameLbl, 2, 14);
+        grid.add(randomnessNameLbl, 2, 14);
         randomnessInput.setMaxSize(60, 20);
         randomnessInput.setEditable(true);
-        Grid.add(randomnessInput, 2, 15);
-        Grid.add(randomnessBtn, 2, 16);
+        grid.add(randomnessInput, 2, 15);
+        grid.add(randomnessBtn, 2, 16);
         randomnessValueLbl.setMinWidth(40);
         randomnessValueLbl.setMaxWidth(40);
-        Grid.add(randomnessValueLbl, 3, 15);
+        grid.add(randomnessValueLbl, 3, 15);
 
         // Start
-        Grid.add(startNameLbl, 5, 5);
+        grid.add(startNameLbl, 5, 5);
         startInput.setMaxSize(60, 20);
         startInput.setEditable(true);
-        Grid.add(startInput, 5, 6);
-        Grid.add(startBtn, 5, 7);
+        grid.add(startInput, 5, 6);
+        grid.add(startBtn, 5, 7);
         startValueLbl.setMinWidth(40);
         startValueLbl.setMaxWidth(40);
-        Grid.add(startValueLbl, 6, 6);
+        grid.add(startValueLbl, 6, 6);
 
         // End
-        Grid.add(endNameLbl, 5, 8);
+        grid.add(endNameLbl, 5, 8);
         endInput.setMaxSize(60, 20);
         endInput.setEditable(true);
-        Grid.add(endInput, 5, 9);
-        Grid.add(endBtn, 5, 10);
+        grid.add(endInput, 5, 9);
+        grid.add(endBtn, 5, 10);
         endValueLbl.setMinWidth(40);
         endValueLbl.setMaxWidth(40);
-        Grid.add(endValueLbl, 6, 9);
+        grid.add(endValueLbl, 6, 9);
 
         // Spray
-        Grid.add(sprayNameLbl, 5, 11);
+        grid.add(sprayNameLbl, 5, 11);
         sprayInput.setMaxSize(60,20);
         sprayInput.setEditable(true);
-        Grid.add(sprayInput,5,12);
-        Grid.add(sprayBtn,5,13);
-        Grid.add(sprayValueLbl, 6,12);
+        grid.add(sprayInput,5,12);
+        grid.add(sprayBtn,5,13);
+        grid.add(sprayValueLbl, 6,12);
 
         // Loop types
         selectLoopComb.setMinWidth(90);
-        Grid.add(selectLoopComb, 0, 3);
+        grid.add(selectLoopComb, 0, 3);
         selectLoopComb.getSelectionModel().selectFirst();
 
         // Exit
-        Grid.add(exitBtn, 21, 20);
+        grid.add(exitBtn, 21, 20);
+
+        // Visualizer
+        grid.add(slider, 21, 11);
+        grid.add(sliderNameLbl,21, 10);
+
+        //maxValue
+        Label sliderMaxValueLbl  = new Label();
+        sliderMaxValueLbl.textProperty().bind(
+                Bindings.format(
+                        "Max value: %.2f",
+                        model.maxValueProperty()
+                )
+        );
+        slider.maxProperty().bind(model.maxValueProperty());
+        grid.add(sliderMaxValueLbl, 21,13);
+
+
+        //Current value label
+        Label sliderValueLbl  = new Label();
+        sliderValueLbl.textProperty().bind(
+                Bindings.format(
+                        "Current value: %.2f",
+                        model.currentValueProperty()
+                )
+        );
+        slider.valueProperty().bindBidirectional(model.currentValueProperty());
+        grid.add(sliderValueLbl, 21,12);
     }
 
     public Parent asParent() {
-        return StartView;
+        return startView;
     }
 }

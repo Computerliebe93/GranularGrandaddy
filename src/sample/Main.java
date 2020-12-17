@@ -25,7 +25,16 @@ public class Main extends Application  {
         primaryStage.setTitle("Grandaddy");
         primaryStage.setScene(new Scene(view.asParent(), 800, 600));
         primaryStage.show();
+
+        //new  thread for model
+        Thread thread = new Thread(synthesizer);
+        thread.start();
     }
+
     public static void main (String[]args) {launch (args);}{
+    }
+    @Override
+    public void stop() {
+        System.exit(0);
     }
 }
