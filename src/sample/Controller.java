@@ -31,38 +31,80 @@ public class Controller {
 
         // Pitch button
         view.pitchBtn.setOnAction(e -> {
-            model.updateGUI(view.pitchValueLbl, view.pitchInput, 1);
-            model.setPitch(Float.parseFloat(view.pitchValueLbl.getText()));
+            if(view.pitchInput.getText().isEmpty()) {
+                System.out.println("Please write a number");
+                view.pitchInput.setText("");
+            } else if(!view.pitchInput.getText().matches("\\d+")){
+                System.out.println("Please write a positive number");
+            } else if(view.pitchInput.getText().matches("\\d+")) {
+                model.updateGUI(view.pitchValueLbl, view.pitchInput, 1);
+                model.setPitch(Float.parseFloat(view.pitchValueLbl.getText()));
+            }
         });
 
         // Set grain size button
         view.grainSizeBtn.setOnAction(e -> {
-            model.updateGUI(view.grainSizeValueLbl, view.grainSizeInput, 2);
-            model.setGrainSize(Float.parseFloat(view.grainSizeValueLbl.getText()));
+            if(view.pitchInput.getText().isEmpty()) {
+                System.out.println("Please write a number");
+                view.pitchInput.setText("");
+            } else if(!view.pitchInput.getText().matches("\\d+")){
+                System.out.println("Please write a positive number");
+            } else if(view.pitchInput.getText().matches("\\d+")) {
+                model.updateGUI(view.grainSizeValueLbl, view.grainSizeInput, 2);
+                model.setGrainSize(Float.parseFloat(view.grainSizeValueLbl.getText()));
+            }
         });
 
         // Set grain interval
         view.grainIntervalBtn.setOnAction(e -> {
-            model.updateGUI(view.grainIntervalValueLbl, view.grainIntervalInput, 3);
-            model.setGrainInterval(Float.parseFloat(view.grainIntervalValueLbl.getText()));
+            if(view.pitchInput.getText().isEmpty()) {
+                System.out.println("Please write a number");
+                view.pitchInput.setText("");
+            } else if(!view.pitchInput.getText().matches("\\d+")){
+                System.out.println("Please write a positive number");
+            } else if(view.pitchInput.getText().matches("\\d+")) {
+                model.updateGUI(view.grainIntervalValueLbl, view.grainIntervalInput, 3);
+                model.setGrainInterval(Float.parseFloat(view.grainIntervalValueLbl.getText()));
+            }
         });
 
         // Set randomness
         view.randomnessBtn.setOnAction(e -> {
-            model.updateGUI(view.randomnessValueLbl, view.randomnessInput, 4);
-            model.setRandomness(Float.parseFloat(view.randomnessValueLbl.getText()));
+            if(view.pitchInput.getText().isEmpty()) {
+                System.out.println("Please write a number");
+                view.pitchInput.setText("");
+            } else if(!view.pitchInput.getText().matches("\\d+")){
+                System.out.println("Please write a positive number");
+            } else if(view.pitchInput.getText().matches("\\d+")) {
+                model.updateGUI(view.randomnessValueLbl, view.randomnessInput, 4);
+                model.setRandomness(Float.parseFloat(view.randomnessValueLbl.getText()));
+            }
         });
 
         // Set start point
         view.startBtn.setOnAction(e -> {
-            model.updateGUI(view.startValueLbl, view.startInput, 5);
-            model.setStart(Float.parseFloat(view.startValueLbl.getText()));
+            if(view.pitchInput.getText().isEmpty()) {
+                System.out.println("Please write a number");
+                view.pitchInput.setText("");
+            } else if(!view.pitchInput.getText().matches("\\d+")){
+                System.out.println("Please write a positive number");
+            } else if(view.pitchInput.getText().matches("\\d+")) {
+                model.updateGUI(view.startValueLbl, view.startInput, 5);
+                model.setStart(Float.parseFloat(view.startValueLbl.getText()));
+            }
         });
 
         // Set end point
         view.endBtn.setOnAction(e -> {
-            model.updateGUI(view.endValueLbl, view.endInput, 6);
-            model.setEnd(Float.parseFloat(view.endValueLbl.getText()));
+            if(view.pitchInput.getText().isEmpty()) {
+                System.out.println("Please write a number");
+                view.pitchInput.setText("");
+            } else if(!view.pitchInput.getText().matches("\\d+")){
+                System.out.println("Please write a positive number");
+            } else if(view.pitchInput.getText().matches("\\d+")) {
+                model.updateGUI(view.endValueLbl, view.endInput, 6);
+                model.setEnd(Float.parseFloat(view.endValueLbl.getText()));
+            }
         });
 
         // Loop type

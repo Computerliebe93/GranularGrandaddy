@@ -63,7 +63,8 @@ public class MidiKeyboard {
                 if (aMsg[0] == keysMidi) {
                     synthesizer.receiveKeysMidi(aMsg);
                 }
-                //System.out.println(aMsg[i]);
+                // This println prints the the raw midi message.
+                // System.out.println(aMsg[i]);
             }
         }
 

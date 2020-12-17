@@ -38,43 +38,37 @@ public class View {
     Label pitchNameLbl = new Label("Pitch");
     Label pitchValueLbl = new Label("0");
     Button pitchBtn = new Button("Set Pitch");
-    Spinner<Float> pitchInput = new Spinner<>(0, 500, 0);
+    TextField pitchInput = new TextField();
 
     // GrainSize
     Label grainSizeNameLbl = new Label("GrainSize");
     Label grainSizeValueLbl = new Label("0");
     Button grainSizeBtn = new Button("Set Grain");
-    Spinner<Float> grainSizeInput = new Spinner<>(0, 500, 0);
+    TextField grainSizeInput = new TextField();
 
     // GrainInterval
     Label grainIntervalNameLbl = new Label("GrainInterval");
     Label grainIntervalValueLbl = new Label("0");
     Button grainIntervalBtn = new Button("Set Grain Interval");
-    Spinner<Float> grainIntervalInput = new Spinner<>(0, 500, 0);
+    TextField grainIntervalInput = new TextField();
 
     // Randomness
     Label randomnessNameLbl = new Label("Randomness");
     Label randomnessValueLbl = new Label("0");
     Button randomnessBtn = new Button("Set Randomness");
-    Spinner<Float> randomnessInput = new Spinner<>(0, 500, 0);
+    TextField randomnessInput = new TextField();
 
     // Start point
     Label startNameLbl = new Label("Start");
     Label startValueLbl = new Label("0");
     Button startBtn = new Button("Set Start");
-    Spinner<Float> startInput = new Spinner<>(0, 500, 0);
+    TextField startInput = new TextField();
 
     // End point
     Label endNameLbl = new Label("End");
     Label endValueLbl = new Label("0");
     Button endBtn = new Button("Set End");
-    Spinner<Float> endInput = new Spinner<>(0, 500, 0);
-
-    // Spray
-    Label sprayNameLbl = new Label("Spray");
-    Label sprayValueLbl = new Label("0");
-    Button sprayBtn = new Button("Set Spray");
-    Spinner<Integer> sprayInput = new Spinner<>(0, 500, 0);
+    TextField endInput = new TextField();
 
     // Loop types
     String loopTypes [] = {"Forwards", "Backwards", "Alternating", "Reset"};
@@ -161,14 +155,6 @@ public class View {
         endValueLbl.setMaxWidth(40);
         grid.add(endValueLbl, 6, 9);
 
-        // Spray
-        grid.add(sprayNameLbl, 5, 11);
-        sprayInput.setMaxSize(60,20);
-        sprayInput.setEditable(true);
-        grid.add(sprayInput,5,12);
-        grid.add(sprayBtn,5,13);
-        grid.add(sprayValueLbl, 6,12);
-
         // Loop types
         selectLoopComb.setMinWidth(90);
         grid.add(selectLoopComb, 0, 3);
@@ -185,7 +171,7 @@ public class View {
         Label sliderMaxValueLbl  = new Label();
         sliderMaxValueLbl.textProperty().bind(
                 Bindings.format(
-                        "Max value: %.2f",
+                        "Max value: %.2f seconds",
                         model.maxValueProperty()
                 )
         );
@@ -197,7 +183,7 @@ public class View {
         Label sliderValueLbl  = new Label();
         sliderValueLbl.textProperty().bind(
                 Bindings.format(
-                        "Current value: %.2f",
+                        "Current value: %.2f seconds",
                         model.currentValueProperty()
                 )
         );

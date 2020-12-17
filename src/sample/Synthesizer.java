@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.concurrent.Task;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.data.Sample;
@@ -32,7 +33,6 @@ public class Synthesizer implements Runnable{
     View view;
     private boolean newSampleSelected = false;
 
-
     // Midi arrays
     private float[] knobValues = new float[9];
     private int[] padValues = new int[] {0};
@@ -44,23 +44,26 @@ public class Synthesizer implements Runnable{
     final double pitchOffset = 0.1 / 6.35;
     final double sizeOffset = 0.7;
     final double intervalOffset = 4;
+    final double randomOffset = 0.1;
     final double loopOffset = 100;
 
     public Synthesizer() {
         Sample sourceSample = null;
 
         try {
+            /* IMPORTANT! This sample is a dummy for running the gsp.
+            Without a dummy the program will NOT run. */
             sourceSample = new Sample("Sinus.wav");
         }
         catch(Exception e){
             System.out.println(e.getMessage());
             e.printStackTrace();
-            System.exit(1);
         }
 
         gsp = new GranularSamplePlayer(ac, sourceSample);
         ac.out.addInput(gsp);
     }
+
     // maxvalue property
     private final DoubleProperty maxValue = new SimpleDoubleProperty(0.0);
     private SamplePlayer.LoopType loopDirection;
@@ -109,7 +112,6 @@ public class Synthesizer implements Runnable{
         // Receives byte[] from midi keyboard and allocated arrays to midi array.
         if (a[1] > 0 && a[1] <= knobValues.length) {
             knobValues[a[1]] = a[2];
-            System.out.println("Knob " + a[1] + " value is set to " + knobValues[a[1]]);
         } else {
             System.out.println("Something went wrong");
         }
@@ -127,7 +129,6 @@ public class Synthesizer implements Runnable{
             setEnd(a[2]);
         }
     }
-
 
     public float getKnobValue(int knobTransmitter) {
         if (knobTransmitter > 0 && knobTransmitter <= knobValues.length) {
@@ -147,7 +148,6 @@ public class Synthesizer implements Runnable{
         if (a[1] >= 0 && a[1] < 8) {
             System.out.println(a[1]);
             padValues[0] = a[1];
-            System.out.println("Active pad is " + padValues[0]);
         }
         if (a[1] == 0) {
             setLoopForwards();
@@ -166,8 +166,10 @@ public class Synthesizer implements Runnable{
     // Keys midi
     public void receiveKeysMidi(byte[] a) {
         keyValues[0] = a[1];
-        System.out.println("Key value is set to " + a[1]);
         setPitch(a[1]);
+        Platform.runLater(() -> {
+            view.pitchValueLbl.setText(String.valueOf(a[1]));
+        });
     }
 
     // Pitch
@@ -196,36 +198,26 @@ public class Synthesizer implements Runnable{
 
     // Randomness
     public void setRandomness(float f) {
-        gsp.setRandomness(new Static(f));
+        gsp.setRandomness(new Static(((f))));
         Platform.runLater(() -> {
             view.randomnessValueLbl.setText(String.valueOf(getKnobValue(4)));
         });
     }
 
-    // Start point
     public void setStart(float f) {
-        //gsp.setLoopStart(new Static( (f)*100));
-        if (getKnobValue(5) >= getKnobValue(6)) {
-            setKnobValue(6, (int) f);
-            gsp.setLoopStart(new Static((float) ((f) * (loopOffset))));
-        }
+        gsp.setLoopStart(new Static((float) ((f) * (loopOffset))));
         Platform.runLater(() -> {
             view.startValueLbl.setText(String.valueOf(getKnobValue(5)));
         });
     }
 
     // End
-    public void setEnd(float f) {
-        //gsp.setLoopEnd(new Static((f)*100));
-        if (getKnobValue(6) <= getKnobValue(5)) {
-            setKnobValue(5, (int) f);
-            gsp.setLoopStart(new Static((float) ((f) * (loopOffset))));
-        }
+    public void setEnd(float f){
+        gsp.setLoopEnd(new Static((float) ((f) * (loopOffset))));
         Platform.runLater(() -> {
-            view.startValueLbl.setText(String.valueOf(getKnobValue(6)));
+            view.endValueLbl.setText(String.valueOf(getKnobValue(6)));
         });
     }
-
 
     public void setLoopForwards() {
         loopDirection = LOOP_FORWARDS;
@@ -258,15 +250,13 @@ public class Synthesizer implements Runnable{
         });
     }
 
-
-
     // Update View
-    public void updateGUI(Label label, Spinner text, int knob){
+    public void updateGUI(Label label, TextField text, int knob){
         if(text != null) {
-            if ((Float.parseFloat(text.getValue().toString())) >= 0) {
+            if ((Float.parseFloat(text.getText())) >= 0) {
                 try {
-                    label.setText(String.valueOf(text.getValue()));
-                    setKnobValue(knob, ((Integer) text.getValue()));
+                    label.setText(text.getText());
+                    setKnobValue(knob, (Integer.valueOf( text.getText())));
                 } catch(NumberFormatException | NullPointerException n) {
                     System.out.println("Please enter an integer number");
                 }
@@ -295,7 +285,6 @@ public class Synthesizer implements Runnable{
         } catch (IOException | NullPointerException e) {
             System.out.println("Sample not selected");
         }
-        System.out.println(path);
         return path;
     }
 
@@ -304,15 +293,10 @@ public class Synthesizer implements Runnable{
     }
 
     public GranularSamplePlayer mountGspSample(){
-        // Creates a new audiocontext if new sample chosen
-        ac.stop();
-        ac.out.kill();
-        ac = new AudioContext();
-
+        // Mounts the gsp with a sample
         Sample sourceSample = null;
         try {
             sourceSample = new Sample(getSample());
-            System.out.println("Sample was set to: " + getSample());
             sampleReady = true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -320,7 +304,7 @@ public class Synthesizer implements Runnable{
             sampleReady = false;
         }
 
-        //resize slider - value is in seconds;do it in new thread bc
+        // Resize slider - value is in seconds;do it in new thread bc
         // https://www.reddit.com/r/javahelp/comments/7qvqau/problem_with_updating_gui_javafx/
         Sample finalSourceSample = sourceSample;
         Platform.runLater(() -> {
@@ -351,7 +335,6 @@ public class Synthesizer implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("OVERRIDE HAPPENED");
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -360,7 +343,6 @@ public class Synthesizer implements Runnable{
                         @Override
                         public void run() {
                             if (gsp != null) {
-                                System.out.println("Position value is " + gsp.getPosition()/1000);
                                 setCurrentValue(gsp.getPosition()/1000);
                             }
                         }
@@ -370,9 +352,6 @@ public class Synthesizer implements Runnable{
             }
         };
         new Thread(() -> task.run()).start();
-
-        System.out.println("After task run");
-
         // while-loop to configure modifiers live
         while (gsp != null) {
 
@@ -381,8 +360,6 @@ public class Synthesizer implements Runnable{
                 gsp = this.mountGspSample();
                 newSampleSelected = false;
             }
-
-
         }
     }
 }

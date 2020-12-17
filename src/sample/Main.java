@@ -22,7 +22,7 @@ public class Main extends Application  {
         synthesizer.setView(view);
         synthesizer.setMidiKeyboard(midiKeyboard);
 
-        primaryStage.setTitle("Grandaddy");
+        primaryStage.setTitle("Granular Grandaddy");
         primaryStage.setScene(new Scene(view.asParent(), 800, 600));
         primaryStage.show();
 
